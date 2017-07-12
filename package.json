@@ -23,7 +23,12 @@
   },
   "homepage": "https://github.com/priyankadarokar/MEAN-Stack-With-Angular-2-Tutorial#readme",
   "dependencies": {
+    "angular2-flash-messages": "^1.0.8",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.17.2",
+    "cors": "^2.8.3",
     "express": "^4.15.3",
+    "jsonwebtoken": "^7.4.1",
     "mongoose": "^4.10.8"
   },
   "devDependencies": {
