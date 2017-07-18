@@ -1,6 +1,6 @@
-const User = require('../models/user');
-const jwt = require('jsonwebtoken');
-const config = require('../config/database');
+const User = require('../models/user'); // Import User Model Schema
+const jwt = require('jsonwebtoken'); // Compact, URL-safe means of representing claims to be transferred between two parties.
+const config = require('../config/database'); // Import database configuration
 
 module.exports = (router) => {
   /* ==============
@@ -56,14 +56,13 @@ module.exports = (router) => {
                 }
               }
             } else {
-              res.json({ success: true, message: 'Account registered!' }); // Return success
+              res.json({ success: true, message: 'Acount registered!' }); // Return success
             }
           });
         }
       }
     }
   });
-
 
   /* ============================================================
      Route to check if user's email is available for registration
@@ -98,8 +97,7 @@ module.exports = (router) => {
       res.json({ success: false, message: 'Username was not provided' }); // Return error
     } else {
       // Look for username in database
-      User.findOne({ username: req.params.username }, (err, user) => {
-        // Check if connection error was found
+      User.findOne({ username: req.params.username }, (err, user) => { // Check if connection error was found
         if (err) {
           res.json({ success: false, message: err }); // Return connection error
         } else {
@@ -114,6 +112,9 @@ module.exports = (router) => {
     }
   });
 
+  /* ========
+  LOGIN ROUTE
+  ======== */
   router.post('/login', (req, res) => {
     // Check if username was provided
     if (!req.body.username) {
@@ -139,7 +140,14 @@ module.exports = (router) => {
                 res.json({ success: false, message: 'Password invalid' }); // Return error
               } else {
                 const token = jwt.sign({ userId: user._id }, config.secret, { expiresIn: '24h' }); // Create a token for client
-                res.json({ success: true, message: 'Success!', token: token, user: { username: user.username } }); // Return success and token to frontend
+                res.json({
+                  success: true,
+                  message: 'Success!',
+                  token: token,
+                  user: {
+                    username: user.username
+                  }
+                }); // Return success and token to frontend
               }
             }
           }
@@ -148,6 +156,10 @@ module.exports = (router) => {
     }
   });
 
+  /* ================================================
+  MIDDLEWARE - Used to grab user's token from headers
+  ================================================ */
+  
   router.use((req, res, next) => {
     const token = req.headers['authorization']; // Create token found in headers
     // Check if token was found in headers
@@ -167,22 +179,25 @@ module.exports = (router) => {
     }
   });
 
-
-  router.get('/profile',(req,res) => {
+  /* ===============================================================
+     Route to get user's profile data
+  =============================================================== */
+  router.get('/profile', (req, res) => {
+    // Search for user in database
     User.findOne({ _id: req.decoded.userId }).select('username email').exec((err, user) => {
-      if(err){
-        res.json({ success: false, message:err });
-      }else{
-        if(!user){
-          res.json({ success: false, message: 'User not found'});
-        }else{
-          res.json({ success: true, user: user});
+      // Check if error connecting
+      if (err) {
+        res.json({ success: false, message: err }); // Return error
+      } else {
+        // Check if user was found in database
+        if (!user) {
+          res.json({ success: false, message: 'User not found' }); // Return error, user was not found in db
+        } else {
+          res.json({ success: true, user: user }); // Return success, send user object to frontend for profile
         }
       }
     });
   });
 
-  
-
-    return router;
+  return router; // Return router object to main index.js
 }
