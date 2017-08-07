@@ -67,6 +67,12 @@ options;
     return this.http.get(this.domain + 'authentication/profile', this.options).map(res => res.json());
    }
 
+   // Function to get public profile data
+  getPublicProfile(username) {
+    this.createAuthenticationHeader(); // Create headers before sending to API
+    return this.http.get(this.domain + 'authentication/publicProfile/' + username, this.options).map(res => res.json());
+  }
+
    loggedIn(){
      return tokenNotExpired();
    }
